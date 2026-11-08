@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zenox Store</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+body { background: #090711; color: white; }
+header { padding: 22px; text-align: center; background: #171027; border-bottom: 1px solid #8b5cf6; }
+header h1 { color: #b58aff; letter-spacing: 2px; }
+header p { color: #aaa; margin-top: 6px; }
+.hero { padding: 35px 20px; text-align: center; }
+.hero h2 { font-size: 27px; margin-bottom: 10px; }
+.hero span { color: #a879ff; }
+.hero p { color: #aaa; font-size: 14px; }
+.container { padding: 15px; max-width: 600px; margin: auto; }
+.section-title { margin: 20px 0; color: #c4a5ff; }
+.product { background: #191426; border: 1px solid #39275b; border-radius: 14px; padding: 18px; margin-bottom: 15px; }
+.product h3 { font-size: 16px; margin-bottom: 10px; }
+.product p { color: #aaa; font-size: 13px; margin-bottom: 12px; }
+.price { color: #b58aff; font-size: 19px; font-weight: bold; margin-bottom: 14px; }
+button { border: none; border-radius: 9px; padding: 12px; cursor: pointer; font-weight: bold; }
+.add-btn { width: 100%; background: #8b5cf6; color: white; }
+.cart { background: #191426; border: 1px solid #39275b; padding: 18px; border-radius: 14px; margin-top: 30px; }
+.cart-item { display: flex; justify-content: space-between; gap: 10px; margin: 13px 0; font-size: 14px; }
+.remove-btn { background: #632c44; color: white; padding: 6px 10px; }
+.total { border-top: 1px solid #49356d; padding-top: 15px; margin-top: 15px; font-weight: bold; color: #c4a5ff; }
+.checkout { width: 100%; background: #25d366; color: #071b0d; margin-top: 17px; font-size: 15px; }
+footer { text-align: center; color: #777; padding: 30px 10px; font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>ZENOX STORE</h1>
+  <p>Trusted Service • Fast Response</p>
+</header>
+<section class="hero">
+  <h2>Welcome to <span>Zenox Store</span></h2>
+  <p>Jasa Joki Steal an Egg dengan harga terjangkau!</p>
+</section>
+<main class="container">
+<h3 class="section-title">🎮 Daftar Produk</h3>
+<div id="products"></div>
+<section class="cart">
+  <h3>🛒 Keranjang Kamu</h3>
+  <div id="cartItems"><p style="color:#888;margin-top:15px">Keranjang masih kosong.</p></div>
+  <div class="total">Total: <span id="total">Rp0</span></div>
+  <button class="checkout" onclick="checkout()">Checkout via WhatsApp</button>
+</section>
+</main>
+<footer>© 2026 Zenox Store. All Rights Reserved.</footer>
+<script>
+const nomorWA = "6288971086357";
+const produk = [
+  { nama: "Joki ambil egg sehari", deskripsi: "Bisa request dan berlaku kelipatan harga.", harga: 15000, icon: "🎮" },
+  { nama: "Joki AFK treadmill + ambil egg sehari", deskripsi: "Bisa request dan berlaku kelipatan.", harga: 25000, icon: "🔥" },
+  { nama: "Joki AFK treadmill 1 hari Steal an Egg", deskripsi: "Jasa AFK treadmill selama 1 hari.", harga: 15000, icon: "👑" },
+  { nama: "Joki semuanya: treadmill + egg + event", deskripsi: "Paket lengkap joki Steal an Egg.", harga: 30000, icon: "⚡" }
+];
+let keranjang = [];
+function rupiah(angka) { return "Rp" + angka.toLocaleString("id-ID"); }
+function tampilkanProduk() {
+  const tempat = document.getElementById("products");
+  tempat.innerHTML = produk.map((p, i) => `
+    <div class="product">
+      <h3>${p.icon} ${p.nama}</h3><p>${p.deskripsi}</p>
+      <div class="price">${rupiah(p.harga)}</div>
+      <button class="add-btn" onclick="tambah(${i})">+ Tambah ke Keranjang</button>
+    </div>`).join("");
+}
+function tambah(index) { keranjang.push(produk[index]); tampilkanKeranjang(); }
+function hapus(index) { keranjang.splice(index, 1); tampilkanKeranjang(); }
+function tampilkanKeranjang() {
+  const tempat = document.getElementById("cartItems");
+  const totalElement = document.getElementById("total");
+  if (keranjang.length === 0) {
+    tempat.innerHTML = `<p style="color:#888;margin-top:15px">Keranjang masih kosong.</p>`;
+  } else {
+    tempat.innerHTML = keranjang.map((p, i) => `
+      <div class="cart-item"><span>${p.nama}<br>${rupiah(p.harga)}</span>
+      <button class="remove-btn" onclick="hapus(${i})">Hapus</button></div>`).join("");
+  }
+  const total = keranjang.reduce((sum, p) => sum + p.harga, 0);
+  totalElement.textContent = rupiah(total);
+}
+function checkout() {
+  if (keranjang.length === 0) { alert("Keranjang kamu masih kosong!"); return; }
+  const total = keranjang.reduce((sum, p) => sum + p.harga, 0);
+  let pesan = "Halo Zenox Store! Saya ingin order:\n\n";
+  keranjang.forEach((p, i) => { pesan += `${i + 1}. ${p.nama} - ${rupiah(p.harga)}\n`; });
+  pesan += `\nTotal: ${rupiah(total)}\n\nMohon info proses selanjutnya. Terima kasih!`;
+  const link = "https://wa.me/" + nomorWA + "?text=" + encodeURIComponent(pesan);
+  window.location.href = link;
+}
+tampilkanProduk();
+tampilkanKeranjang();
+</script>
+</body>
+</html>
